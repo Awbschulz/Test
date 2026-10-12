@@ -1,0 +1,7 @@
+VEYRA DIRECT-START IPHONE BUILD
+
+The title screen and loading screen are removed.
+The game starts directly after the 3D engine initializes.
+No service worker is registered, and prior VEYRA caches are removed.
+
+IMPORTANT: deploy this as a NEW site so it receives a NEW HTTPS address. Reusing the old site address may allow the old service worker to serve the old start screen before this build is reached.

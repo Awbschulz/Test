@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#080d12" />
+  <meta name="description" content="VEYRA: Ashes of the Glass Tide — an original browser action RPG vertical slice." />
+  <title>VEYRA: Ashes of the Glass Tide</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="styles-v4.css" />
+  <script defer src="babylon-v4.js"></script>
+  <script defer src="game-v4.js"></script>
+<script>
+if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})}).catch(function(){})}
+if('caches' in window){caches.keys().then(function(ks){ks.forEach(function(k){if(k.indexOf('veyra')===0)caches.delete(k)})}).catch(function(){})}
+</script>
+</head>
+<body>
+  <div id="loading" style="display:none"><i id="loadFill"></i><span id="loadText"></span></div>
+  <canvas id="game" aria-label="3D game viewport"></canvas>
+
+  <section id="hud" class="hidden" aria-live="polite">
+    <div class="hud-left">
+      <div class="level-orb"><b id="level">1</b><span>LEVEL</span></div>
+      <div class="bars">
+        <div class="bar hp"><i id="hpFill"></i><span id="hpText"></span></div>
+        <div class="bar focus"><i id="focusFill"></i><span id="focusText"></span></div>
+        <div class="bar stamina"><i id="staminaFill"></i></div>
+      </div>
+    </div>
+    <div id="objective" class="objective glass"></div>
+    <canvas id="compass" width="420" height="48" aria-label="Compass"></canvas>
+    <div class="map-cluster glass"><canvas id="minimap" width="180" height="180"></canvas><button id="mapBtn" aria-label="Open map">MAP</button></div>
+    <div id="bossHud" class="boss hidden"><span id="bossName">THE CHIME-EATER</span><div><i id="bossFill"></i></div></div>
+    <div id="prompt" class="prompt hidden"></div>
+    <div id="quickslots" class="quickslots"></div>
+    <div id="desktopHint">WASD MOVE · SHIFT RUN · SPACE JUMP · F/LMB ATTACK · E INTERACT · V CAMERA · I PACK · M MAP</div>
+    <div id="reticle">•</div>
+  </section>
+
+  <section id="mobileControls" class="hidden" aria-label="Touch controls">
+    <div id="joystick" class="joystick"><div id="stick"></div></div>
+    <div class="touch-actions">
+      <button id="touchAttack" class="round attack">⚔<span>STRIKE</span></button>
+      <button id="touchSkill" class="round skill">✦<span>SKILL</span></button>
+      <button id="touchJump" class="round">↑<span>JUMP</span></button>
+      <button id="touchRun" class="round">»<span>RUN</span></button>
+      <button id="touchInteract" class="round">◇<span>USE</span></button>
+      <button id="touchCamera" class="round">◉<span>VIEW</span></button>
+    </div>
+  </section>
+
+  <section id="panel" class="overlay hidden" role="dialog" aria-modal="true">
+    <div class="panel-shell glass">
+      <header><div><span class="eyebrow">PILGRIM LEDGER</span><h2 id="panelTitle">Inventory</h2></div><button class="close" data-close>×</button></header>
+      <nav><button data-tab="inventory" class="active">Inventory</button><button data-tab="skills">Skills</button><button data-tab="quests">Objectives</button><button data-tab="character">Character</button></nav>
+      <div id="panelBody" class="panel-body"></div>
+    </div>
+  </section>
+
+  <section id="worldMap" class="overlay hidden" role="dialog" aria-modal="true">
+    <div class="map-shell glass"><header><div><span class="eyebrow">THE GLASS TIDE</span><h2>Wayfinder</h2></div><button class="close" data-close>×</button></header><canvas id="fullMap"></canvas><p>Gold: objective · Cyan: discovered landmark · White: your heading</p></div>
+  </section>
+
+  <section id="trader" class="overlay hidden" role="dialog" aria-modal="true">
+    <div class="panel-shell trade-shell glass"><header><div><span class="eyebrow">MOTHREST EXCHANGE</span><h2>Senn's Tidewares</h2><p id="tradeGold"></p></div><button class="close" data-close>×</button></header><div id="tradeBody" class="trade-grid"></div></div>
+  </section>
+
+  <section id="dialog" class="overlay hidden" role="dialog" aria-modal="true">
+    <div class="dialog-card glass"><span class="eyebrow">MOTH-TONGUE</span><h2 id="dialogName"></h2><p id="dialogText"></p><div id="dialogChoices"></div></div>
+  </section>
+
+  <section id="settings" class="overlay hidden" role="dialog" aria-modal="true">
+    <div class="settings-card glass"><header><h2>Settings</h2><button class="close" data-close>×</button></header>
+      <label>Quality <select id="quality"><option value="auto">Adaptive</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label>
+      <label>Look sensitivity <input id="sensitivity" type="range" min="0.3" max="2" step="0.1" value="1" /></label>
+      <label><input id="audioToggle" type="checkbox" checked /> Audio</label>
+      <label><input id="reducedToggle" type="checkbox" /> Reduced camera motion</label>
+      <button id="resetSave" class="danger">Erase local pilgrimage</button>
+      <p id="techInfo"></p>
+    </div>
+  </section>
+
+  <section id="pauseMenu" class="overlay hidden"><div class="pause-card glass"><span class="eyebrow">THE TIDE IS STILL</span><h2>Paused</h2><button id="resumeBtn" class="primary">Resume</button><button id="saveBtn">Save now</button><button id="pauseSettingsBtn">Settings</button><button id="returnTitleBtn">Return to title</button></div></section>
+  <div id="deathFade" class="death hidden"><h2>YOUR ECHO SCATTERS</h2><p>The last waystone remembers you.</p></div>
+  <div id="toast" class="toast hidden"></div>
+  <div id="damageFlash"></div>
+  <noscript>This game requires JavaScript.</noscript>
+</body>
+</html>

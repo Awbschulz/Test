@@ -1,0 +1,17 @@
+{
+  "name": "VEYRA: Ashes of the Glass Tide",
+  "short_name": "VEYRA",
+  "start_url": "./",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#05090d",
+  "theme_color": "#080d12",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
